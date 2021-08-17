@@ -24,12 +24,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control"  type="password"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ConfirmPassword" class="control-label"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
+                <input asp-for="ConfirmPassword" class="form-control" type="password" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -49,23 +49,49 @@
             <span asp-validation-for="Country" class="text-danger"></span>
         </div>*@
 
-        <div class="form-group">
-            @*@if (ViewBag.CountryList != null)
-        {
-            @Html.DropDownListFor(model => model.Country, ViewBag.CountryList as SelectList, "--Select Country--", new { @class = "form-control" })
-        }*@
-
-            <select id="drpConuntryList" class="form-control" asp-for="Country" asp-items="@(new SelectList(Model.CountryList, "CountryId", "CountryName"))">
-                <option value="">--Select--</option>
-            </select>
-            <span asp-validation-for="Country" class="text-danger"></span>
-            <input type="hidden" asp-for="Country" />
-        </div>
             <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
+                @*@if (ViewBag.CountryList != null)
+            {
+                @Html.DropDownListFor(model => model.Country, ViewBag.CountryList as SelectList, "--Select Country--", new { @class = "form-control" })
+            }*@
+
+                @*<select id="drpConuntryList" class="form-control" asp-for="Country" asp-items="@(new SelectList(Model.CountryList, "CountryId", "CountryName"))">
+                <option value="">--Select--</option>
+            </select>*@
+
+                <select id="drpConuntryList" class="form-control" asp-for="Country" asp-items="@ViewBag.CountryList">
+                    <option value="">--Select--</option>
+                </select>
+                <span asp-validation-for="Country" class="text-danger"></span>
+                <input type="hidden" asp-for="Country" />
             </div>
+
+            <div class="form-group">
+
+
+                <select id="drpCityList" class="form-control" asp-for="City" asp-items="@new SelectList(Enumerable.Empty<SelectListItem>())">
+                    <option value="">--Select City--</option>
+                </select>
+                <span asp-validation-for="City" class="text-danger"></span>
+                <input type="hidden" asp-for="City" />
+            </div>
+
+            <div class="form-group">
+
+                @foreach (var g in ViewBag.Gender)
+                {
+                    <input id="@g.Text" type="radio" name="Gender" value="@g.Value" />
+                    <label for="@g.Value">@g.Text</label>
+                    <br />
+                }
+                
+        <span asp-validation-for="Gender" class="text-danger"></span>
+
+        <input type="hidden" asp-for="Gender" />
+
+            </div>
+
+    
 
 
 
@@ -79,9 +105,9 @@
 
 
 @section Scripts {
-    @*@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}*@
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @*<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>*@
     <script>
         jQuery.validator.unobtrusive.adapters.add("checkbox", function (options) {
             if (options.element.tagName.toUpperCase() == "INPUT" && options.element.type.toUpperCase() == "CHECKBOX") {
@@ -90,6 +116,17 @@
                     options.messages["required"] = options.message;
                 }
             }
+        });
+
+        $(document).ready(function () {
+            $("#drpConuntryList").change(function () {
+                        $.get("/Account/GetCityList", { CountryId: $("#drpConuntryList").val() }, function (data) {
+                            $("#drpCityList").empty();
+                    $.each(data, function (index, row) {
+                        $("#drpCityList").append("<option value='" + row.cityId + "'>" + row.cityName + "</option>")
+                    });
+                });
+            })
         });
     </script>
 }

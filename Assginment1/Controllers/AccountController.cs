@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Assginment1.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Serialization;
+
+//using Microsoft.AspNetCore.Mvc.JsonResult;
 
 namespace Assginment1.Controllers
 {
@@ -29,17 +32,34 @@ namespace Assginment1.Controllers
 
         };
 
+        public List<SelectListItem> Gender = new List<SelectListItem>()
+        {
+            new SelectListItem() { Text = "Male", Value = "M" },
+            new SelectListItem() { Text = "Femalre", Value = "F" }
+
+        };
+       
+
         public IActionResult SignUp()
         {
 
             UserModel model = new UserModel();
             //model.Countries = new SelectList(lstCountires, "CountryId", "CountryName"); ;
-            model.CountryList = lstCountires;
-           // ViewBag.CountryList = new SelectList(lstCountires, "CountryId", "CountryName");
+           // model.CountryList = lstCountires;
+            ViewBag.CountryList = new SelectList(lstCountires, "CountryId", "CountryName");
+            ViewBag.Gender = Gender;
+
             return View();
         }
 
-    
+        public JsonResult GetCityList(int CountryId)
+        {
+         
+            List<City> filterCityList = lstCities.FindAll( x => x.CountryId == CountryId);
+            return new Microsoft.AspNetCore.Mvc.JsonResult( filterCityList);
+
+        }
+
 
         [HttpPost]
         public IActionResult SignUp(UserModel model) //model binding

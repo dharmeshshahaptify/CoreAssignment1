@@ -39,6 +39,8 @@ namespace Assginment1.Models
         public string City{ get; set; }
         public SelectList Cities { get; set; }
 
+        [Required(ErrorMessage = "Gender is required.")]
+        public string Gender { get; set; }
 
 
     }
